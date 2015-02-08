@@ -1,12 +1,17 @@
-
-https://msdn.microsoft.com/en-us/library/dd162609.aspx : EnumDisplayDevices 
-
-https://msdn.microsoft.com/en-us/library/dd162611.aspx : EnumDisplaySettings 
-
+https://msdn.microsoft.com/en-us/library/6sh2ey19(v=vs.90).aspx : List<T>
+https://msdn.microsoft.com/en-us/library/he2s3bh7(v=vs.90).aspx : LinkedList<T>
 https://msdn.microsoft.com/en-us/library/dd183411.aspx : ChangeDisplaySettings 
 
-http://www.codeproject.com/Articles/6810/Dynamic-Screen-Resolution : example for changing resolution
+System::Array
+System::Collections:: ... Dictionary<TKey,TValue>
+System::Collections::Generic::List<T>
 
+
+
+DONE:
+https://msdn.microsoft.com/en-us/library/dd162609.aspx : EnumDisplayDevices 
+https://msdn.microsoft.com/en-us/library/dd162611.aspx : EnumDisplaySettings 
+http://www.codeproject.com/Articles/6810/Dynamic-Screen-Resolution : example for changing resolution
 
 
 ========================================================================

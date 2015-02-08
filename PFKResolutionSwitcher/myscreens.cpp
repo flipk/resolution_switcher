@@ -6,6 +6,7 @@
 using namespace PFKResolutionSwitcher;
 using namespace System;
 using namespace System::Runtime::InteropServices;
+using namespace System::Collections;
 
 namespace SysWin32
 {
@@ -24,102 +25,139 @@ namespace SysWin32
 		DEVMODE *lpDevMode);
 };
 
+allScreens::allScreens(void)
+{
+	screens = gcnew System::Collections::Generic::List<aScreen^>;
+	int ind;
+	bool done = false;
+	for (ind = 0; !done; ind++)
+	{
+		aScreen ^ scr = gcnew aScreen(ind);
+		if (scr->good)
+			screens->Add(scr);
+		done = scr->done;
+	}
+}
+
+allScreens::~allScreens(void)
+{
+	// nothing to do
+}
+
+System::String ^
+allScreens::getInfo(void)
+{
+	System::String ^ ret = "";
+	for each (aScreen ^ scr in screens)
+		ret += scr->getInfo();
+	return ret;
+}
+
 aScreen::aScreen(int index)
 {
-	int ind;
-	bool done, res;
-	DEVMODE * pdm = 0;
-	DEVMODE * dm = 0;
+	bool res, modes_done;
+	int mode_index;
+	aScreenMode ^ mode;
+	aScreenMode ^ prevMode;
 
-	modes = 0;
 	dev = new DISPLAY_DEVICE;
+	modes = gcnew System::Collections::Generic::List<aScreenMode^>;
+
 	dev->cb = sizeof(DISPLAY_DEVICE);
-	res = SysWin32::EnumDisplayDevices((char*)0, index, 
-		dev, EDD_GET_DEVICE_INTERFACE_NAME);
-	if (res && (dev->StateFlags & DISPLAY_DEVICE_ACTIVE))
+	res = SysWin32::EnumDisplayDevices(
+		(char*)0, index, dev, EDD_GET_DEVICE_INTERFACE_NAME);
+	if (res)
 	{
-		name = gcnew System::String(dev->DeviceName);
-		flags = dev->StateFlags;
-		done = false;
-		for (ind = 0; !done; ind++)
+		if (dev->StateFlags & DISPLAY_DEVICE_ACTIVE)
 		{
-			// if this is first, or if the previous
-			// went unused, reuse it.
-			if (!dm)
-				dm = new DEVMODE;
-			dm->dmSize = sizeof(DEVMODE);
-			dm->dmDriverExtra = 0;
-			res = SysWin32::EnumDisplaySettings(
-				dev->DeviceName, ind, dm);
-			if (res)
+			good = true;
+			name = gcnew System::String(dev->DeviceName);
+			for (modes_done = false, mode_index = 0;
+				!modes_done;
+				mode_index++)
 			{
-				bool useit = true;
-				// only support 32bpp and 60hz
-				if (dm->dmBitsPerPel != 32)
-					useit = false;
-				if (dm->dmDisplayFrequency != 60)
-					useit = false;
-				if (pdm &&
-					dm->dmPelsWidth == pdm->dmPelsWidth &&
-					dm->dmPelsHeight == pdm->dmPelsHeight)
+				mode = gcnew aScreenMode(this, prevMode, mode_index);
+				if (mode->good)
 				{
-					useit = false;
+					modes->Add(mode);
+					mode->screen = this;
+					prevMode = mode;
 				}
-				if (useit)
-				{
-					dm->next = 0;
-					if (pdm)
-						pdm->next = dm;
-					else
-						modes = dm;
-					pdm = dm;
-					dm = 0;
-				}
-				// else, reuse dm in the next entry
+				modes_done = mode->done;
 			}
-			else
-				done = true;
 		}
-		// free up the last unused object.
-		if (dm)
-			delete dm;
+		else
+		{
+			good = false;
+		}
+		done = false;
+	}
+	else
+	{
+		good = false;
+		done = true;
 	}
 }
 
 aScreen::~aScreen(void)
 {
 	delete dev;
-	DEVMODE * dm, * ndm;
-	for (dm = modes; dm; dm = ndm)
-	{
-		ndm = dm->next;
-		delete dm;
-	}
 }
 
 System::String ^
-aScreen::getinfo(void)
+aScreen::getInfo(void)
 {
-	DEVMODE * dm;
-	int ind;
-	System::String ^ ret =
-		"name=" + name + "; flags=" + flags.ToString() + "; ";
-
-	for (ind = 0, dm = modes; dm; dm = dm->next, ind++)
-	{
-		System::String ^ i =
-			"\r\n\t" + ind.ToString()
-			+ ": " + dm->dmPelsWidth.ToString()
-			+ "x" + dm->dmPelsHeight.ToString();
-		ret = ret + i;
-	}
-
+	System::String ^ ret;
+	ret = "Screen:" + name + "; modes: ";
+	for each (aScreenMode ^ mode in modes)
+		ret += mode->getInfo() + " ";
+	ret += "\r\n";
 	return ret;
 }
 
-//static
-aScreen ^
-aScreen :: getScreen(int index)
+aScreenMode::aScreenMode(aScreen ^ scr, aScreenMode ^ prev, int index)
 {
-	return gcnew aScreen(index);
+	bool res;
+
+	mode = new DEVMODE;
+	mode->dmSize = sizeof(DEVMODE);
+	mode->dmDriverExtra = 0;
+	res = SysWin32::EnumDisplaySettings(
+		scr->dev->DeviceName, index, mode);
+	if (res)
+	{
+		if (mode->dmBitsPerPel != 32)
+			good = false;
+		else if (mode->dmDisplayFrequency != 60)
+			good = false;
+		else if (prev &&
+			prev->mode->dmPelsWidth == mode->dmPelsWidth &&
+			prev->mode->dmPelsHeight == mode->dmPelsHeight)
+			good = false;
+		else
+			good = true;
+		done = false;
+	}
+	else
+	{
+		good = false;
+		done = true;
+	}
+	if (good)
+	{
+		name = mode->dmPelsWidth.ToString()
+			+ "x"
+			+ mode->dmPelsHeight.ToString();
+	}
+}
+
+aScreenMode::~aScreenMode(void)
+{
+	delete mode;
+}
+
+System::String ^
+aScreenMode::getInfo(void)
+{
+	return name;
 }

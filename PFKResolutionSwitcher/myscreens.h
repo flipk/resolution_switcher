@@ -78,21 +78,43 @@ struct DEVMODE {
   DWORD dmReserved2;
   DWORD dmPanningWidth;
   DWORD dmPanningHeight;
-  struct DEVMODE * next;
 };
+
+	ref class aScreen;
+	public ref class aScreenMode
+	{
+	public:
+		aScreenMode(aScreen ^ scr, aScreenMode ^ prev, int index);
+		~aScreenMode(void);
+		bool good;
+		bool done;
+		DEVMODE * mode;
+		aScreen ^ screen;
+		System::String ^ name;
+		System::String ^ getInfo(void);
+		System::Windows::Forms::CheckBox^  checkBoxMode;
+	};
 
 	public ref class aScreen
 	{
 	public:
 		aScreen(int index);
 		~aScreen(void);
-		System::String ^ name;
-		System::String ^ getinfo(void);
-		int flags;
+		bool good;
+		bool done;
 		DISPLAY_DEVICE * dev;
-		DEVMODE * modes;
-
-		static aScreen ^ getScreen(int index);
+		System::String ^ getInfo(void);
+		System::String ^ name;
+		System::Collections::Generic::List<aScreenMode^> ^ modes;
+		System::Windows::Forms::Label^  labelMonitor;
 	};
 
+	public ref class allScreens
+	{
+	public:
+		allScreens(void);
+		~allScreens(void);
+		System::Collections::Generic::List<aScreen^> ^ screens;
+		System::String ^ getInfo(void);
+	};
 };

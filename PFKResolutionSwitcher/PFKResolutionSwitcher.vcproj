@@ -200,6 +200,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Form1.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\myscreens.cpp"
 				>
 			</File>
