@@ -55,6 +55,8 @@ System::Void Form1::myLoadEvent(System::Object^  sender, System::EventArgs^  e)
 			cb->Location = System::Drawing::Point(X + 20, Y);
 			cb->Text = mode->getInfo();
 			cb->UseVisualStyleBackColor = true;
+			if (mode->current)
+				cb->Checked = true;
 			this->Controls->Add(cb);
 			Y += delta_Y;
 			if (Y > largest_Y)

@@ -79,6 +79,7 @@ struct DEVMODE {
   DWORD dmPanningWidth;
   DWORD dmPanningHeight;
 };
+#define ENUM_CURRENT_SETTINGS -1
 
 	ref class aScreen;
 	public ref class aScreenMode
@@ -88,11 +89,13 @@ struct DEVMODE {
 		~aScreenMode(void);
 		bool good;
 		bool done;
+		bool current;
 		DEVMODE * mode;
 		aScreen ^ screen;
 		System::String ^ name;
 		System::String ^ getInfo(void);
 		System::Windows::Forms::CheckBox^  checkBoxMode;
+		bool sameMode(aScreenMode ^ other);
 	};
 
 	public ref class aScreen

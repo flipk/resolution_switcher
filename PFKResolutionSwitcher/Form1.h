@@ -37,6 +37,7 @@ namespace PFKResolutionSwitcher {
 	private: System::Windows::Forms::Label^  selectModesLabel;
 	private: System::Windows::Forms::Button^  buttonSave;
 	private: System::Windows::Forms::Button^  buttonCancel;
+	private: System::Windows::Forms::CheckBox^  checkBox1;
 	private: System::ComponentModel::IContainer^  components;
 
 	private:
@@ -55,6 +56,7 @@ namespace PFKResolutionSwitcher {
 			this->selectModesLabel = (gcnew System::Windows::Forms::Label());
 			this->buttonSave = (gcnew System::Windows::Forms::Button());
 			this->buttonCancel = (gcnew System::Windows::Forms::Button());
+			this->checkBox1 = (gcnew System::Windows::Forms::CheckBox());
 			this->SuspendLayout();
 			// 
 			// textBox1
@@ -101,11 +103,24 @@ namespace PFKResolutionSwitcher {
 			this->buttonCancel->UseVisualStyleBackColor = true;
 			this->buttonCancel->Click += gcnew System::EventHandler(this, &Form1::buttonCancel_Click);
 			// 
+			// checkBox1
+			// 
+			this->checkBox1->AutoSize = true;
+			this->checkBox1->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point, 
+				static_cast<System::Byte>(0)));
+			this->checkBox1->Location = System::Drawing::Point(122, 273);
+			this->checkBox1->Name = L"checkBox1";
+			this->checkBox1->Size = System::Drawing::Size(89, 17);
+			this->checkBox1->TabIndex = 13;
+			this->checkBox1->Text = L"checkBox1";
+			this->checkBox1->UseVisualStyleBackColor = true;
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(306, 326);
+			this->Controls->Add(this->checkBox1);
 			this->Controls->Add(this->buttonCancel);
 			this->Controls->Add(this->buttonSave);
 			this->Controls->Add(this->selectModesLabel);

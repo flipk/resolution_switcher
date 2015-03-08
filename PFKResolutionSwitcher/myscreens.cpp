@@ -57,6 +57,7 @@ aScreen::aScreen(int index)
 {
 	bool res, modes_done;
 	int mode_index;
+	aScreenMode ^ currentMode;
 	aScreenMode ^ mode;
 	aScreenMode ^ prevMode;
 
@@ -70,6 +71,8 @@ aScreen::aScreen(int index)
 	{
 		if (dev->StateFlags & DISPLAY_DEVICE_ACTIVE)
 		{
+			currentMode = gcnew aScreenMode(
+				this, prevMode, ENUM_CURRENT_SETTINGS);
 			good = true;
 			name = gcnew System::String(dev->DeviceName);
 			for (modes_done = false, mode_index = 0;
@@ -82,6 +85,8 @@ aScreen::aScreen(int index)
 					modes->Add(mode);
 					mode->screen = this;
 					prevMode = mode;
+					if (mode->sameMode(currentMode))
+						mode->current = true;
 				}
 				modes_done = mode->done;
 			}
@@ -119,6 +124,7 @@ aScreenMode::aScreenMode(aScreen ^ scr, aScreenMode ^ prev, int index)
 {
 	bool res;
 
+	current = false;
 	mode = new DEVMODE;
 	mode->dmSize = sizeof(DEVMODE);
 	mode->dmDriverExtra = 0;
@@ -154,6 +160,21 @@ aScreenMode::aScreenMode(aScreen ^ scr, aScreenMode ^ prev, int index)
 aScreenMode::~aScreenMode(void)
 {
 	delete mode;
+}
+
+bool
+aScreenMode::sameMode(aScreenMode ^ other)
+{
+	if (mode->dmBitsPerPel == other->mode->dmBitsPerPel  &&
+		mode->dmPelsWidth == other->mode->dmPelsWidth &&
+		mode->dmPelsHeight == other->mode->dmPelsHeight
+//&& mode->dmDisplayFrequency == other->mode->dmDisplayFrequency
+		)
+	{
+		return true;
+	}
+	// else
+	return false;
 }
 
 System::String ^
