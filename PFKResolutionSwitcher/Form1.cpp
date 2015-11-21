@@ -12,7 +12,6 @@ Form1::Form1(void)
 {
 	InitializeComponent();
 	screens = gcnew allScreens;
-	textBox1->Text += screens->getInfo();
 }
 
 Form1::~Form1()
@@ -29,7 +28,7 @@ System::Void Form1::myLoadEvent(System::Object^  sender, System::EventArgs^  e)
 	int start_X = 30;
 	int start_Y = 40;
 	int delta_X = 125;
-	int delta_Y = 20;
+	int delta_Y = 25;
 	int X = start_X, Y = start_Y;
 	int largest_Y = Y;
 
@@ -38,7 +37,8 @@ System::Void Form1::myLoadEvent(System::Object^  sender, System::EventArgs^  e)
 	for each (aScreen ^ scr in screens->screens)
 	{
 		Y = start_Y;
-		System::Windows::Forms::Label ^ lbl = gcnew System::Windows::Forms::Label;
+		System::Windows::Forms::Label ^ lbl =
+			gcnew System::Windows::Forms::Label;
 		lbl->AutoSize = true;
 		lbl->Location = System::Drawing::Point(X, Y);
 		lbl->Text = scr->name;
@@ -46,84 +46,51 @@ System::Void Form1::myLoadEvent(System::Object^  sender, System::EventArgs^  e)
 		Y += delta_Y;
 		if (Y > largest_Y)
 			largest_Y = Y;
-		scr->labelMonitor = lbl;
 		for each (aScreenMode ^ mode in scr->modes)
 		{
-			System::Windows::Forms::CheckBox ^ cb =
-				gcnew System::Windows::Forms::CheckBox;
-			cb->AutoSize = true;
-			cb->Location = System::Drawing::Point(X + 20, Y);
-			cb->Text = mode->getInfo();
-			cb->UseVisualStyleBackColor = true;
-
-			//TODO: if registry entries loaded, populated Checked
-			// from the registry; otherwise use mode->current.
-
-			if (mode->current)
-				cb->Checked = true;
+			System::Windows::Forms::Button ^ btn =
+				gcnew System::Windows::Forms::Button;
+			btn->Location = System::Drawing::Point(X + 20, Y);
+			btn->Text = mode->getInfo();
+			btn->UseVisualStyleBackColor = true;
 
 			mode->form1 = this;
-			cb->CheckedChanged +=
-				gcnew System::EventHandler(mode, &aScreenMode::checkboxClicked);
+			btn->Click +=
+				gcnew System::EventHandler(mode, &aScreenMode::btnClicked);
 
-			this->Controls->Add(cb);
+			this->Controls->Add(btn);
 			Y += delta_Y;
 			if (Y > largest_Y)
 				largest_Y = Y;
-			mode->checkBoxMode = cb;
+			mode->btnMode = btn;
 		}
 		X += delta_X;
 	}
 	largest_Y += 20;
-	this->buttonSave->Location = System::Drawing::Point(X/2-80, largest_Y);
-	this->buttonCancel->Location = System::Drawing::Point(X/2+5, largest_Y);
 	largest_Y += 30;
 	X += delta_X;
-	this->textBox1->Location = System::Drawing::Point(10, largest_Y);
-	this->textBox1->Size = System::Drawing::Size(X-20, 220);
 	largest_Y += 40;
-	this->Size = System::Drawing::Size(X, largest_Y + 220);
-
-	this->systemTrayIcon->ContextMenu =
-		gcnew System::Windows::Forms::ContextMenu;
-
-	this->systemTrayIcon->ContextMenu->MenuItems->Add("Exit");
+	this->Size = System::Drawing::Size(X, largest_Y);
 
 	this->ResumeLayout(false);
 	this->PerformLayout();
 }
 
 System::Void
-Form1::systemTrayIcon_Click(System::Object^  sender,
+Form1::notifyIconClicked(System::Object^  sender,
 							System::EventArgs^  e)
 {
 	this->Visible = true;
 }
 
 System::Void
-Form1::buttonSave_Click(System::Object^  sender,
-						System::EventArgs^  e)
+Form1::hideButtonClicked(System::Object^  sender, System::EventArgs^  e)
 {
-	this->systemTrayIcon->ContextMenu->MenuItems->Clear();
-	for each (aScreen ^ scr in screens->screens)
-	{
-		for each (aScreenMode ^ mode in scr->modes)
-		{
-			System::Windows::Forms::MenuItem ^ it;
-			if (mode->checkBoxMode->Checked)
-			{
-				it = gcnew System::Windows::Forms::MenuItem(
-					mode->screen->name + "  " + mode->name);
-				this->systemTrayIcon->ContextMenu->MenuItems->Add(it);
-			}
-		}
-	}
-	this->systemTrayIcon->ContextMenu->MenuItems->Add("Exit");
+	this->Visible = false;
 }
 
 System::Void
-Form1::buttonCancel_Click(System::Object^  sender,
-						  System::EventArgs^  e)
+Form1::exitButtonClicked(System::Object^  sender, System::EventArgs^  e)
 {
-	this->Visible = false;
+	Application::Exit();
 }

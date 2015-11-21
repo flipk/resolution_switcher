@@ -194,7 +194,7 @@ aScreenMode::getInfo(void)
 
 #define NULL ((void*)0)
 System::Void
-aScreenMode::checkboxClicked(System::Object^  sender, System::EventArgs^  e)
+aScreenMode::btnClicked(System::Object^  sender, System::EventArgs^  e)
 {
 	SysWin32::ChangeDisplaySettingsEx(this->screen->dev->DeviceName,
 		this->mode, NULL,

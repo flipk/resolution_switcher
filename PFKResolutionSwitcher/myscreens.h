@@ -101,11 +101,10 @@ struct DEVMODE {
 		aScreen ^ screen;
 		System::String ^ name;
 		System::String ^ getInfo(void);
-		System::Windows::Forms::CheckBox^  checkBoxMode;
+		System::Windows::Forms::Button^  btnMode;
 		bool sameMode(aScreenMode ^ other);
-
 		PFKResolutionSwitcher::Form1 ^ form1;
-		System::Void checkboxClicked(System::Object^  sender, System::EventArgs^  e);
+		System::Void btnClicked(System::Object^  sender, System::EventArgs^  e);
 	};
 
 	public ref class aScreen
@@ -119,7 +118,6 @@ struct DEVMODE {
 		System::String ^ getInfo(void);
 		System::String ^ name;
 		System::Collections::Generic::List<aScreenMode^> ^ modes;
-		System::Windows::Forms::Label^  labelMonitor;
 	};
 
 	public ref class allScreens
