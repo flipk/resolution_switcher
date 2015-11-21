@@ -23,6 +23,15 @@ namespace SysWin32
 		char *lpszDeviceName,
 		int iModeNum,
 		DEVMODE *lpDevMode);
+
+	[DllImport("user32.dll",CharSet = CharSet::Ansi)]
+	extern LONG ChangeDisplaySettingsEx(
+		/*_In_*/ char*    lpDevice,
+		/*_In_*/ DEVMODE *lpDevMode,
+		/*	  */ void*    hwnd, // HWND should be NULL
+		/*_In_*/ int      dwflags,
+		/*_In_*/ void*    lParam ); // NULL
+
 };
 
 allScreens::allScreens(void)
@@ -137,8 +146,8 @@ aScreenMode::aScreenMode(aScreen ^ scr, aScreenMode ^ prev, int index)
 		else if (mode->dmDisplayFrequency != 60)
 			good = false;
 		else if (prev &&
-			prev->mode->dmPelsWidth == mode->dmPelsWidth &&
-			prev->mode->dmPelsHeight == mode->dmPelsHeight)
+				prev->mode->dmPelsWidth  == mode->dmPelsWidth &&
+				prev->mode->dmPelsHeight == mode->dmPelsHeight)
 			good = false;
 		else
 			good = true;
@@ -181,4 +190,14 @@ System::String ^
 aScreenMode::getInfo(void)
 {
 	return name;
+}
+
+#define NULL ((void*)0)
+System::Void
+aScreenMode::checkboxClicked(System::Object^  sender, System::EventArgs^  e)
+{
+	SysWin32::ChangeDisplaySettingsEx(this->screen->dev->DeviceName,
+		this->mode, NULL,
+		0 /*CDS_UPDATEREGISTRY*/,
+		NULL);
 }

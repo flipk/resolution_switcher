@@ -1,5 +1,12 @@
 /* -*- Mode:c++; eval:(c-set-style "BSD"); c-basic-offset:4; indent-tabs-mode:t; tab-width:4 -*- */
 
+#include "stdafx.h"
+
+namespace PFKResolutionSwitcher {
+	//forward decl
+	ref class Form1;
+};
+
 namespace PFKResolutionSwitcher {
 
 struct DISPLAY_DEVICE
@@ -96,6 +103,9 @@ struct DEVMODE {
 		System::String ^ getInfo(void);
 		System::Windows::Forms::CheckBox^  checkBoxMode;
 		bool sameMode(aScreenMode ^ other);
+
+		PFKResolutionSwitcher::Form1 ^ form1;
+		System::Void checkboxClicked(System::Object^  sender, System::EventArgs^  e);
 	};
 
 	public ref class aScreen
