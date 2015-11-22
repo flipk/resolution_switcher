@@ -1,5 +1,5 @@
 /Debug
-/Release
+*.pdb
 /PFKResolutionSwitcher/Debug
 /PFKResolutionSwitcher/Release
 /PFKResolutionSwitcher/PFKResolutionSwitcher.vcproj.*
