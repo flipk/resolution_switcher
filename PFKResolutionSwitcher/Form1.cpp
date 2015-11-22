@@ -10,87 +10,55 @@ using namespace System::Collections;
 
 Form1::Form1(void)
 {
-	InitializeComponent();
+	System::Windows::Forms::MenuItem ^ item;
+	System::ComponentModel::ComponentResourceManager^  resources;
+	System::Windows::Forms::MenuItem::MenuItemCollection ^ menu;
+
+	notifyIcon1 = gcnew System::Windows::Forms::NotifyIcon;
+	notifyIcon1->ContextMenu = gcnew System::Windows::Forms::ContextMenu;
+	menu = notifyIcon1->ContextMenu->MenuItems;
+	notifyIcon1->BalloonTipText = L"PFK Resolution Switcher";
+	resources = gcnew System::ComponentModel::ComponentResourceManager(Form1::typeid);
+	notifyIcon1->Icon = (cli::safe_cast<System::Drawing::Icon^  >(resources->GetObject(L"notifyIcon1.Icon")));
+	notifyIcon1->Text = L"PFK Resolution Switcher";
+	notifyIcon1->Visible = true;
 	screens = gcnew allScreens;
+	for each (aScreen ^ scr in screens->screens)
+	{
+		item = gcnew System::Windows::Forms::MenuItem;
+		item->Text = scr->name;
+		menu->Add(item);
+		for each (aScreenMode ^ mode in scr->modes)
+		{
+			item = gcnew System::Windows::Forms::MenuItem;
+			item->Text = mode->getInfo();
+			mode->form1 = this;
+			item->Click += gcnew System::EventHandler(mode, &aScreenMode::btnClicked);
+			menu->Add(item);
+		}
+	}
+	item = gcnew System::Windows::Forms::MenuItem;
+	item->Click += gcnew System::EventHandler(this, &Form1::exitMenuClick);
+	item->Text = L"Exit";
+	menu->Add(item);
 }
 
 Form1::~Form1()
 {
-	if (components)
-	{
-		delete components;
+	if (notifyIcon1)
+		delete notifyIcon1;
+	if (screens)
 		delete screens;
-	}
-}
-
-System::Void Form1::myLoadEvent(System::Object^  sender, System::EventArgs^  e)
-{
-	int start_X = 30;
-	int start_Y = 40;
-	int delta_X = 125;
-	int delta_Y = 25;
-	int X = start_X, Y = start_Y;
-	int largest_Y = Y;
-
-	this->Visible = false;
-	this->SuspendLayout();
-	for each (aScreen ^ scr in screens->screens)
-	{
-		Y = start_Y;
-		System::Windows::Forms::Label ^ lbl =
-			gcnew System::Windows::Forms::Label;
-		lbl->AutoSize = true;
-		lbl->Location = System::Drawing::Point(X, Y);
-		lbl->Text = scr->name;
-		this->Controls->Add(lbl);
-		Y += delta_Y;
-		if (Y > largest_Y)
-			largest_Y = Y;
-		for each (aScreenMode ^ mode in scr->modes)
-		{
-			System::Windows::Forms::Button ^ btn =
-				gcnew System::Windows::Forms::Button;
-			btn->Location = System::Drawing::Point(X + 20, Y);
-			btn->Text = mode->getInfo();
-			btn->UseVisualStyleBackColor = true;
-
-			mode->form1 = this;
-			btn->Click +=
-				gcnew System::EventHandler(mode, &aScreenMode::btnClicked);
-
-			this->Controls->Add(btn);
-			Y += delta_Y;
-			if (Y > largest_Y)
-				largest_Y = Y;
-			mode->btnMode = btn;
-		}
-		X += delta_X;
-	}
-	largest_Y += 20;
-	largest_Y += 30;
-	X += delta_X;
-	largest_Y += 40;
-	this->Size = System::Drawing::Size(X, largest_Y);
-
-	this->ResumeLayout(false);
-	this->PerformLayout();
 }
 
 System::Void
-Form1::notifyIconClicked(System::Object^  sender,
-							System::EventArgs^  e)
+Form1::exitMenuClick(System::Object^  sender, System::EventArgs^  e)
 {
-	this->Visible = true;
-}
-
-System::Void
-Form1::hideButtonClicked(System::Object^  sender, System::EventArgs^  e)
-{
-	this->Visible = false;
-}
-
-System::Void
-Form1::exitButtonClicked(System::Object^  sender, System::EventArgs^  e)
-{
+	if (notifyIcon1)
+		delete notifyIcon1;
+	notifyIcon1 = nullptr;
+	if (screens)
+		delete screens;
+	screens = nullptr;
 	Application::Exit();
 }

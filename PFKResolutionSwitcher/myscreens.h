@@ -101,7 +101,6 @@ struct DEVMODE {
 		aScreen ^ screen;
 		System::String ^ name;
 		System::String ^ getInfo(void);
-		System::Windows::Forms::Button^  btnMode;
 		bool sameMode(aScreenMode ^ other);
 		PFKResolutionSwitcher::Form1 ^ form1;
 		System::Void btnClicked(System::Object^  sender, System::EventArgs^  e);
